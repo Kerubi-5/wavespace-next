@@ -112,8 +112,8 @@ export default function Home() {
         console.log("getTotalWaves ~ error", error);
       }
     };
-    console.log("Total Waves:", totalWaves);
-  }, [isLoading]);
+    getTotalWaves();
+  }, [isLoading, currentAccount]);
 
   return (
     <>

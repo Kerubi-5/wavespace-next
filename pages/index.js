@@ -5,8 +5,8 @@ export default function Home() {
         Hey There
       </h1>
       <p className="text-base font-semibold text-gray-500">
-        <span>👋</span> My name is John Kim A. Querobines, Click the button
-        below to wave at me!
+        <span>👋</span> My name is John Kim, Click the button below to wave at
+        me!
       </p>
       <button className="font-semibold px-4 py-2 m-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-md text-white mt-5">
         Wave at Me

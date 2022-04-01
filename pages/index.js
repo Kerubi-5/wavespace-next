@@ -64,7 +64,7 @@ export default function Home() {
   const getWavePortalContract = async () => {
     try {
       const { ethereum } = window;
-      const contractAddress = "0x7aFA4e93DC6DaeC79E39F522eF4A70cfA47aFa93";
+      const contractAddress = "0x2Cca99E47D843DCdA9d5Afca65087CaA85D1ac8F";
       const contractABI = abi.abi;
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);

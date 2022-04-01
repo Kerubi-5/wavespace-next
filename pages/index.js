@@ -159,9 +159,13 @@ export default function Home() {
             at me!
           </p>
 
-          <div className="bg-white inline-block mt-5 rounded-l-md">
+          <div
+            className={`${
+              isLoading ? "bg-gray-200" : "bg-white"
+            } inline-block mt-5 rounded-md`}
+          >
             <input
-              className="outline-none px-2"
+              className="outline-none px-2 bg-transparent"
               onChange={(e) => setMsg(e.target.value)}
               value={msg}
               disabled={isLoading && "disabled"}

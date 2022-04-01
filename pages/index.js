@@ -7,6 +7,8 @@ export default function Home() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [totalWaves, setTotalWaves] = useState(0);
+  const [allWaves, setAllWaves] = useState([]);
+  const [msg, setMsg] = useState("");
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -86,8 +88,9 @@ export default function Home() {
       /*
        * Execute the actual wave from your smart contract
        */
-      const waveTxn = await wavePortalContract.wave();
+      const waveTxn = await wavePortalContract.wave(msg);
       setIsLoading(true);
+      setMsg("");
       console.log("Mining...", waveTxn.hash);
 
       await waveTxn.wait();
@@ -115,11 +118,33 @@ export default function Home() {
     getTotalWaves();
   }, [isLoading, currentAccount]);
 
+  useEffect(() => {
+    const getAllWaves = async () => {
+      try {
+        const wavePortalContract = await getWavePortalContract();
+        const waves = await wavePortalContract.getAllWaves();
+
+        setAllWaves(
+          waves.map((item) => {
+            return {
+              address: item.waver,
+              msg: item.message,
+              time: item.timestamp,
+            };
+          })
+        );
+      } catch (error) {
+        console.log("getAllWaves ~ error", error);
+      }
+    };
+    getAllWaves();
+  }, [isLoading, currentAccount]);
+
   return (
     <>
       <Menu connectWallet={connectWallet} currentAccount={currentAccount} />
-      <div className="container mx-auto px-4 text-center py-9 font-roboto bg-gray-50 m-5 rounded-xl shadow-md relative">
-        <div className="flex items-center gap-2">
+      <div className="container mx-auto px-4 text-center py-9 font-roboto bg-gray-100 m-5 rounded-xl shadow-md relative">
+        <div className="flex items-center gap-2 px-4">
           <h2 className="text-xl font-semibold">Total Waves:</h2>
           <span className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full h-10 w-10 flex items-center justify-center text-white">
             {totalWaves}
@@ -133,36 +158,75 @@ export default function Home() {
             <span>👋</span> My name is John Kim, Click the button below to wave
             at me!
           </p>
-          <button
-            className={`font-semibold px-4 py-2 m-2 ${
-              isLoading
-                ? "bg-gray-500"
-                : "bg-gradient-to-r from-purple-500 to-blue-500"
-            } rounded-md text-white mt-5 inline-flex items-center`}
-            onClick={wave}
-            disabled={isLoading && "disabled"}
-          >
-            {isLoading && (
-              <svg
-                role="status"
-                className="mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                viewBox="0 0 100 101"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                  fill="currentFill"
-                />
-              </svg>
-            )}
-            Wave at Me
-          </button>
+
+          <div className="bg-white inline-block mt-5 rounded-l-md">
+            <input
+              className="outline-none px-2"
+              onChange={(e) => setMsg(e.target.value)}
+              value={msg}
+              disabled={isLoading && "disabled"}
+            />
+            <button
+              className={`font-semibold px-4 py-2 ${
+                isLoading
+                  ? "bg-gray-500"
+                  : "bg-gradient-to-r from-purple-500 to-blue-500"
+              } rounded-r-md text-white inline-flex items-center`}
+              onClick={wave}
+              disabled={isLoading && "disabled"}
+            >
+              Send Message
+              {isLoading ? (
+                <svg
+                  role="status"
+                  className="ml-2 w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                  viewBox="0 0 100 101"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentFill"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div className="p-4 bg-gray-100 rounded-xl container mx-auto shadow-md space-y-4">
+        {allWaves.map((item) => {
+          return (
+            <div
+              className="bg-gray-50 shadow-sm p-4 rounded-md break-all"
+              key={item.time}
+            >
+              <div>Address: {item.address}</div>
+              <div>Time: {item.time.toString()}</div>
+              <div>Message: {item.msg}</div>
+            </div>
+          );
+        })}
       </div>
     </>
   );

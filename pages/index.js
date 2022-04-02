@@ -162,7 +162,7 @@ export default function Home() {
           <div
             className={`${
               isLoading ? "bg-gray-200" : "bg-white"
-            } inline-block mt-5 rounded-md`}
+            } inline-flex mt-5 rounded-md`}
           >
             <input
               className="outline-none px-2 bg-transparent"

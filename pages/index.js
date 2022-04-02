@@ -9,6 +9,7 @@ export default function Home() {
   const [totalWaves, setTotalWaves] = useState(0);
   const [allWaves, setAllWaves] = useState([]);
   const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -88,7 +89,10 @@ export default function Home() {
       /*
        * Execute the actual wave from your smart contract
        */
-      const waveTxn = await wavePortalContract.wave(msg);
+      const waveTxn = await wavePortalContract.wave(msg, {
+        gasLimit: 300000,
+      });
+
       setIsLoading(true);
       setMsg("");
       console.log("Mining...", waveTxn.hash);
@@ -98,6 +102,10 @@ export default function Home() {
       setIsLoading(false);
     } catch (error) {
       console.log(error);
+      setError(
+        "To prevent spamming, you can only send a message every 1 minute"
+      );
+      setIsLoading(false);
     }
   };
 
@@ -142,6 +150,35 @@ export default function Home() {
 
   return (
     <>
+      <div
+        className={`absolute w-full h-[250px] top-0 bg-white z-50 break-words text-clip overflow-auto p-4 shadow-sm ${
+          error === "" && "hidden"
+        }`}
+      >
+        <div
+          className="absolute top-2 right-2 p-4 cursor-pointer"
+          onClick={() => setError("")}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </div>
+        <div className="">
+          <h2 className="text-lg font-bold text-red-600">Error:</h2>
+          <p>{error}</p>
+        </div>
+      </div>
       <Menu connectWallet={connectWallet} currentAccount={currentAccount} />
       <div className="container mx-auto px-4 text-center py-9 font-roboto bg-gray-100 m-5 rounded-xl shadow-md relative">
         <div className="flex items-center gap-2 px-4">

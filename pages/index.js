@@ -103,7 +103,7 @@ export default function Home() {
     } catch (error) {
       console.log(error);
       setError(
-        "To prevent spamming, you can only send a message every 1 minute"
+        "To prevent spamming, you can only send a message every 15 minutes"
       );
       setIsLoading(false);
     }
@@ -137,7 +137,7 @@ export default function Home() {
             return {
               address: item.waver,
               msg: item.message,
-              time: item.timestamp,
+              time: new Date(item.timestamp * 1000),
             };
           })
         );
@@ -147,6 +147,38 @@ export default function Home() {
     };
     getAllWaves();
   }, [isLoading, currentAccount]);
+
+  useEffect(() => {
+    let wavePortalContract;
+
+    const onNewWave = (from, timestamp, message) => {
+      console.log("NewWave", from, timestamp, message);
+      setAllWaves((prevState) => [
+        ...prevState,
+        {
+          address: from,
+          time: new Date(timestamp * 1000),
+          message: message,
+        },
+      ]);
+    };
+
+    const waveEmitter = async () => {
+      if (window.ethereum) {
+        const wavePortalContract = await getWavePortalContract();
+
+        wavePortalContract.on("NewWave", onNewWave);
+      }
+
+      return () => {
+        if (wavePortalContract) {
+          wavePortalContract.off("NewWave", onNewWave);
+        }
+      };
+    };
+
+    waveEmitter();
+  }, []);
 
   return (
     <>
@@ -257,13 +289,16 @@ export default function Home() {
 
       <div className="p-4 bg-gray-100 rounded-xl container mx-auto shadow-md space-y-4">
         {allWaves.map((item) => {
+          console.log(item.time);
           return (
             <div
               className="bg-gray-50 shadow-sm p-4 rounded-md break-all"
               key={item.time}
             >
               <div>Address: {item.address}</div>
-              <div>Time: {item.time.toString()}</div>
+              <div>
+                Time: {item.time.toLocaleString("en-GB", { timeZone: "UTC" })}
+              </div>
               <div>Message: {item.msg}</div>
             </div>
           );

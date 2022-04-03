@@ -16,7 +16,7 @@ export default function Home() {
       const { ethereum } = window;
 
       if (!ethereum) {
-        console.log("Make sure you have metamask!");
+        setError("Make sure you have a MetaMask!");
         return;
       } else {
         console.log("We have the ethereum object", ethereum);
@@ -29,10 +29,9 @@ export default function Home() {
 
       if (accounts.length !== 0) {
         const account = accounts[0];
-        console.log("Found an authorized account:", account);
         setCurrentAccount(account);
       } else {
-        console.log("No authorized account found");
+        setError("No authorized account found");
       }
     } catch (error) {
       console.log(error);
@@ -72,7 +71,7 @@ export default function Home() {
         const signer = provider.getSigner();
         return new ethers.Contract(contractAddress, contractABI, signer);
       } else {
-        console.log("Ethereum object doesn't exist!");
+        setError("Ethereum object doesn't exist!");
       }
     } catch (error) {
       console.log(error);
@@ -101,7 +100,6 @@ export default function Home() {
       console.log("Mined -- ", waveTxn.hash);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
       setError(
         "To prevent spamming, you can only send a message every 15 minutes"
       );
@@ -299,8 +297,7 @@ export default function Home() {
       </div>
 
       <div className="p-4 bg-gray-100 rounded-xl container mx-auto shadow-md space-y-4">
-        {allWaves.map((item) => {
-          console.log(item.time);
+        {allWaves.reverse().map((item) => {
           return (
             <div
               className="bg-gray-50 shadow-sm p-4 rounded-md break-all grid gap-4 md:grid-cols-2"

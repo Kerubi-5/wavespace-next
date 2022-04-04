@@ -155,7 +155,7 @@ export default function Home() {
       }
     };
     getAllWaves();
-  }, [isLoading, currentAccount]);
+  }, []);
 
   useEffect(() => {
     let wavePortalContract;
@@ -167,7 +167,7 @@ export default function Home() {
         {
           address: from,
           time: new Date(timestamp * 1000),
-          message: message,
+          msg: message,
         },
       ]);
     };
@@ -297,7 +297,7 @@ export default function Home() {
       </div>
 
       <div className="p-4 bg-gray-100 rounded-xl container mx-auto shadow-md space-y-4">
-        {allWaves.reverse().map((item) => {
+        {allWaves.map((item) => {
           return (
             <div
               className="bg-gray-50 shadow-sm p-4 rounded-md break-all grid gap-4 md:grid-cols-2"
